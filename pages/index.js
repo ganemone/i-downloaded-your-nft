@@ -1,10 +1,9 @@
 import Head from "next/head";
-import Image from "next/image";
 import TweetForm from "../components/tweet-form";
 import styles from "../styles/Home.module.css";
 import needle from "needle";
 
-const baseURL = process.env.BASE_URL;
+// const baseURL = process.env.BASE_URL;
 
 export default function Home(props) {
   let { name, url } = props;
@@ -42,7 +41,11 @@ export async function getServerSideProps({ query }) {
       tweetId = tweetId.substring(0, tweetId.length - 1);
     }
     tweetId = tweetId.split("/").pop();
-    const res = await needle("POST", `${baseURL}/api/download`, { tweetId });
+    const res = await needle(
+      "POST",
+      `https://www.i-downloaded-your-nft.com/api/download`,
+      { tweetId }
+    );
     return {
       props: {
         name: name || "Random Internet Person",
