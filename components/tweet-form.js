@@ -15,6 +15,9 @@ export default function TweetForm() {
               tweetId = tweetId.substring(0, tweetId.length - 1);
             }
             tweetId = tweetId.split("/").pop();
+            if (tweetId.includes("?")) {
+              tweetId = tweetId.split("?")[0];
+            }
             e.target.elements.tweetId.value = tweetId;
             return true;
           }}
