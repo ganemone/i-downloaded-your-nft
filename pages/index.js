@@ -45,7 +45,7 @@ export async function getServerSideProps({ query }) {
       tweetId = tweetId.substring(0, tweetId.length - 1);
     }
     tweetId = tweetId.split("/").pop();
-    await needle("POST", "localhost:3000/api/download", { tweetId });
+    await needle("POST", "https://i-downloaded-your-nft.vercel.app/api/download", { tweetId });
   }
   return {
     props: {
