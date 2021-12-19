@@ -9,10 +9,13 @@ export default async function handler(req, res) {
     return res.status(400).end();
   }
   const { tweetId } = req.body;
+  console.log("tweetId", tweetId);
   const imageUrl = await getMediaFromTweet(tweetId);
+  console.log("imageUrl", imageUrl);
   if (imageUrl) {
-    await uploadImageFromUrl(imageUrl, tweetId);
-    return res.status(200).end();
+    const hostedUrl = await uploadImageFromUrl(imageUrl, tweetId);
+    console.log("hostedUrl", hostedUrl);
+    return res.status(200).json({ url: hostedUrl });
   } else {
     return res.status(500).end();
   }

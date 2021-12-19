@@ -4,9 +4,11 @@ import TweetForm from "../components/tweet-form";
 import styles from "../styles/Home.module.css";
 import needle from "needle";
 
+const baseURL = process.env.BASE_URL;
+
 export default function Home(props) {
-  let { name, tweetId } = props;
-  if (!tweetId) {
+  let { name, url } = props;
+  if (!url) {
     return <TweetForm />;
   }
   if (!name) {
@@ -27,12 +29,7 @@ export default function Home(props) {
         <h2>
           Hello! My name is <i>{name}</i> and I downloaded your NFT lmao
         </h2>
-        <Image
-          src={`https://i.ibb.co/ss2FZZp/${tweetId}.jpg`}
-          alt="Dumb NFT"
-          width="500"
-          height="500"
-        />
+        <img src={url} alt="Dumb NFT" width="500" height="500" />
       </main>
     </div>
   );
@@ -45,12 +42,18 @@ export async function getServerSideProps({ query }) {
       tweetId = tweetId.substring(0, tweetId.length - 1);
     }
     tweetId = tweetId.split("/").pop();
-    await needle("POST", "https://i-downloaded-your-nft.vercel.app/api/download", { tweetId });
+    const res = await needle("POST", `${baseURL}/api/download`, { tweetId });
+    return {
+      props: {
+        name: name || "Random Internet Person",
+        url: res.body.url,
+      },
+    };
   }
   return {
     props: {
-      name: name || "Random Internet Person",
-      tweetId: tweetId || null,
+      name: null,
+      url: null,
     },
   };
 }

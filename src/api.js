@@ -3,7 +3,7 @@ const needle = require("needle");
 const token = process.env.TWITTER_API_BEARER_TOKEN;
 const endpointURL = "https://api.twitter.com/2/tweets?ids=";
 const uploadUrl = `https://api.imgbb.com/1/upload?key=${process.env.IMGBB_API_KEY}`;
-const expiration = 2678400; // 1 month
+const expiration = 60 * 5;
 
 export async function getMediaFromTweet(tweetId) {
   const params = {
@@ -25,7 +25,9 @@ export async function getMediaFromTweet(tweetId) {
     apiResult.body.includes &&
     Array.isArray(apiResult.body.includes.media)
   ) {
-    const imageUrl = apiResult.body.includes.media[0].url;
+    const imageUrl =
+      apiResult.body.includes.media[0].url ||
+      apiResult.body.includes.media[0].preview_image_url;
     return imageUrl;
   } else {
     console.log("Error", apiResult.body);
@@ -35,18 +37,10 @@ export async function getMediaFromTweet(tweetId) {
 
 export async function uploadImageFromUrl(imageUrl, tweetId) {
   const extension = imageUrl.split(".").pop();
-  const hasImageResponse = await needle(
-    "HEAD",
-    `https://i.ibb.co/ss2FZZp/${tweetId}.${extension}`
+  const uploadRes = await needle(
+    "POST",
+    `${uploadUrl}&image=${imageUrl}&expiration=${expiration}&name=${tweetId}`
   );
-  if (hasImageResponse.statusCode === 200) {
-    return;
-  } else {
-    const uploadRes = await needle(
-      "POST",
-      `${uploadUrl}&image=${imageUrl}&expiration=${expiration}&name=${tweetId}`
-    );
-    console.log("uploadRes", uploadRes.body);
-    return;
-  }
+  console.log("uploadRes", uploadRes.body);
+  return uploadRes.body.data.url;
 }
