@@ -5,7 +5,10 @@ export default function TweetForm() {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
-        <h2>Lets troll some crypto bros. Enter a link to a tweet below</h2>
+        <h2>
+          Lets troll some crypto bros. Enter a link to a tweet with an NFT image
+          attached
+        </h2>
         <form
           method="GET"
           action="/"
