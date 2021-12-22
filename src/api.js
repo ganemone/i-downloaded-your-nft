@@ -4,6 +4,7 @@ const token = process.env.TWITTER_API_BEARER_TOKEN;
 const endpointURL = "https://api.twitter.com/2/tweets?ids=";
 const uploadUrl = `https://api.imgbb.com/1/upload?key=${process.env.IMGBB_API_KEY}`;
 const expiration = 60 * 5;
+const userId = "1473736396301033488";
 
 export async function getMediaFromTweet(tweetId) {
   const params = {
@@ -43,4 +44,80 @@ export async function uploadImageFromUrl(imageUrl, tweetId) {
   );
   console.log("uploadRes", uploadRes.body);
   return uploadRes.body.data.url;
+}
+
+export async function getUserMentions() {
+  let userMentions = [];
+  let params = {
+    max_results: 5,
+    "tweet.fields": "created_at,referenced_tweets",
+  };
+
+  const options = {
+    headers: {
+      "User-Agent": "v2UserMentionssJS",
+      authorization: `Bearer ${token}`,
+    },
+  };
+
+  const resp = await needle(
+    "get",
+    `https://api.twitter.com/2/users/${userId}/mentions`,
+    params,
+    options
+  );
+  if (
+    resp &&
+    resp.body &&
+    resp.body.meta &&
+    resp.body.meta.result_count &&
+    resp.body.meta.result_count > 0
+  ) {
+    if (resp.body.data) {
+      userMentions = resp.body.data;
+    }
+    console.dir(userMentions, {
+      depth: null,
+    });
+    console.log(`Got ${userMentions.length} mentions for user ID ${userId}!`);
+  }
+  return userMentions;
+}
+
+export async function getUserTweets() {
+  let tweets = [];
+  let params = {
+    max_results: 5,
+    "tweet.fields": "created_at,referenced_tweets",
+  };
+
+  const options = {
+    headers: {
+      "User-Agent": "v2UserTweetsJS",
+      authorization: `Bearer ${token}`,
+    },
+  };
+
+  const resp = await needle(
+    "get",
+    `https://api.twitter.com/2/users/${userId}/tweets`,
+    params,
+    options
+  );
+  if (
+    resp &&
+    resp.body &&
+    resp.body.meta &&
+    resp.body.meta.result_count &&
+    resp.body.meta.result_count > 0
+  ) {
+    if (resp.body.data) {
+      tweets = resp.body.data;
+    }
+    console.dir(tweets, {
+      depth: null,
+    });
+    console.log(`Got ${tweets.length} mentions for user ID ${userId}!`);
+  }
+  return tweets;
 }
