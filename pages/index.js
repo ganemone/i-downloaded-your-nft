@@ -6,12 +6,9 @@ import needle from "needle";
 // const baseURL = process.env.BASE_URL;
 
 export default function Home(props) {
-  let { name, url } = props;
+  let { url } = props;
   if (!url) {
     return <TweetForm />;
-  }
-  if (!name) {
-    name = "Random Internet Person";
   }
   return (
     <div className={styles.container}>
@@ -25,9 +22,7 @@ export default function Home(props) {
       </Head>
 
       <main className={styles.main}>
-        <h2>
-          Hello! My name is <i>{name}</i> and I downloaded your NFT lmao
-        </h2>
+        <h1>I downloaded your NFT lmao</h1>
         <img src={url} alt="Dumb NFT" width="500" height="500" />
       </main>
     </div>
@@ -35,7 +30,7 @@ export default function Home(props) {
 }
 
 export async function getServerSideProps({ query }) {
-  let { name, tweetId } = query;
+  let { tweetId } = query;
   if (tweetId) {
     if (tweetId.endsWith("/")) {
       tweetId = tweetId.substring(0, tweetId.length - 1);
@@ -48,14 +43,12 @@ export async function getServerSideProps({ query }) {
     );
     return {
       props: {
-        name: name || "Random Internet Person",
         url: res.body.url,
       },
     };
   }
   return {
     props: {
-      name: null,
       url: null,
     },
   };

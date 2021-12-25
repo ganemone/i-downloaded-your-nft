@@ -5,6 +5,52 @@ const endpointURL = "https://api.twitter.com/2/tweets?ids=";
 const uploadUrl = `https://api.imgbb.com/1/upload?key=${process.env.IMGBB_API_KEY}`;
 const expiration = 60 * 5;
 const userId = "1473736396301033488";
+var OAuth = require("oauth");
+var Twit = require("twit");
+
+var T = new Twit({
+  consumer_key: process.env.TWITTER_API_KEY,
+  consumer_secret: process.env.TWITTER_API_KEY_SECRET,
+  access_token: process.env.TWITTER_ACCESS_TOKEN,
+  access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
+});
+
+var twitterConsumerKey = process.env.TWITTER_API_KEY;
+var twitterConsumerSecret = process.env.TWITTER_API_KEY_SECRET;
+
+var oauth = new OAuth.OAuth(
+  "https://api.twitter.com/oauth/request_token",
+  "https://api.twitter.com/oauth/access_token",
+  twitterConsumerKey,
+  twitterConsumerSecret,
+  "1.0A",
+  null,
+  "HMAC-SHA1"
+);
+
+export async function respondToMention(referencedTweetId, img) {
+  const data = await uploadImageFromBuffer(img);
+  var mediaIdStr = data.media_id_string;
+  oauth.post(
+    "https://api.twitter.com/2/tweets",
+    process.env.TWITTER_ACCESS_TOKEN,
+    process.env.TWITTER_ACCESS_TOKEN_SECRET,
+    JSON.stringify({
+      reply: {
+        in_reply_to_tweet_id: referencedTweetId,
+      },
+      media: {
+        media_ids: [mediaIdStr],
+      },
+      text: `lmao`,
+    }),
+    "application/json",
+    function (e, data, res) {
+      if (e) console.error(e);
+      console.log(require("util").inspect(data));
+    }
+  );
+}
 
 export async function getMediaFromTweet(tweetId) {
   const params = {
@@ -120,4 +166,21 @@ export async function getUserTweets() {
     console.log(`Got ${tweets.length} mentions for user ID ${userId}!`);
   }
   return tweets;
+}
+
+export function uploadImageFromBuffer(img) {
+  return new Promise((resolve, reject) => {
+    T.post(
+      "media/upload",
+      { media_data: img.toString("base64") },
+      function (err, data, response) {
+        if (err) {
+          console.log("error", err);
+          return reject(err);
+        }
+        console.log("data", data);
+        return resolve(data);
+      }
+    );
+  });
 }

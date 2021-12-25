@@ -31,12 +31,6 @@ export default function TweetForm() {
             placeholder="https://twitter.com/user/status/123456789 or 123456789"
             size={100}
           />
-          <input
-            type="text"
-            name="name"
-            placeholder="Your name (optional)"
-            size={100}
-          />
           <button type="submit">Submit</button>
         </form>
       </main>
